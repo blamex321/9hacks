@@ -14,6 +14,16 @@ app.set('view engine', 'ejs');
 
 mongoose.connect("mongodb://127.0.0.1:27017/hackDB")
 
+const appointmentSchema = new mongoose.Schema({
+  name : String,
+  registration : String,
+  bloodGroup : String,
+  mobile:String,
+  date:String
+});
+
+const Appointment = mongoose.model("appointment",appointmentSchema);
+
 const postSchema = new mongoose.Schema({
   title: String,
   content: String,
@@ -39,7 +49,7 @@ app.post("/create",function(req,res){
       console.log(err);
     } else {
       console.log("Post saved successfully");
-      res.redirect("/")
+      res.send("Post saved successfully");
     }
   })
 });
@@ -47,6 +57,28 @@ app.post("/create",function(req,res){
 app.get("/",function(req,res){
   res.sendFile(__dirname + "/index.html");
 });
+
+app.get("/health",function(req,res){
+  res.sendFile(__dirname + "/health.html");
+});
+
+app.post("/health",function(req,res){
+  const appointmentData = new Appointment({
+    name : req.body.name,
+    registration:req.body.rNo,
+    bloodGroup:req.body.bloodGroup,
+    mobile:req.body.mobile,
+    date:req.body.date
+  });
+  appointmentData.save(function(err){
+    if(err){
+      console.log(err);
+    } else {
+      console.log("Saved Successfully");
+      res.send("Appointment Created");
+    }
+  })
+})
 
 app.get("/list", function(req, res) {
   Post.find({}, function(err, posts) {
@@ -71,6 +103,14 @@ app.get("/posts/:postId", function(req, res){
      category:post.category
    });
  });
+});
+
+app.get("/marketplace/auto",function(req,res){
+  const autoDetails = {
+    Name: "Raviteja",
+    mobile: "8179588838"
+  }
+  res.send(autoDetails);
 });
 
 app.post("/posts/:postId/like",function(req,res){
